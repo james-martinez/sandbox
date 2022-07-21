@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ../../kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: tink-server
+  name: tink-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: tink-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ../../kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: tink-server
+    spec:
+      containers:
+        - env:
+            - name: FACILITY
+              value: onprem
+            - name: PGDATABASE
+              value: tinkerbell
+            - name: PGHOST
+              value: db
+            - name: PGPASSWORD
+              value: tinkerbell
+            - name: PGPORT
+              value: "5432"
+            - name: PGSSLMODE
+              value: disable
+            - name: PGUSER
+              value: tinkerbell
+            - name: TINKERBELL_GRPC_AUTHORITY
+              value: :42113
+            - name: TINKERBELL_HTTP_AUTHORITY
+              value: :42114
+            - name: TINKERBELL_TLS
+              value: ' false'
+          image: quay.io/tinkerbell/tink:${vTINK}
+          name: tink-server
+          ports:
+            - containerPort: 42113
+            - containerPort: 42114
+          resources: {}
+          volumeMounts:
+            - mountPath: /certs/onprem
+              name: certs
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: certs
+          persistentVolumeClaim:
+            claimName: certs
+            readOnly: true
+status: {}

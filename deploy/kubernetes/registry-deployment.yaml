@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ../../kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: registry
+  name: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: registry
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ../../kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: registry
+    spec:
+      containers:
+        - env:
+            - name: REGISTRY_AUTH
+              value: htpasswd
+            - name: REGISTRY_AUTH_HTPASSWD_PATH
+              value: /auth/.htpasswd
+            - name: REGISTRY_AUTH_HTPASSWD_REALM
+              value: Registry Realm
+            - name: REGISTRY_HTTP_ADDR
+              value: 192.168.56.4:443
+            - name: REGISTRY_HTTP_TLS_CERTIFICATE
+              value: /certs/onprem/server-crt.pem
+            - name: REGISTRY_HTTP_TLS_KEY
+              value: /certs/onprem/server-key.pem
+          image: registry:2.7.1
+          name: registry
+          resources: {}
+          volumeMounts:
+            - mountPath: /auth
+              name: auth
+              readOnly: true
+            - mountPath: /certs/onprem
+              name: certs
+              readOnly: true
+            - mountPath: /var/lib/registry
+              name: registry-data
+      restartPolicy: Always
+      volumes:
+        - name: auth
+          persistentVolumeClaim:
+            claimName: auth
+            readOnly: true
+        - name: certs
+          persistentVolumeClaim:
+            claimName: certs
+            readOnly: true
+        - name: registry-data
+          persistentVolumeClaim:
+            claimName: registry-data
+status: {}

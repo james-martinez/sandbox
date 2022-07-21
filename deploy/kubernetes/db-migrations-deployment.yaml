@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ../../kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: db-migrations
+  name: db-migrations
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: db-migrations
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ../../kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: db-migrations
+    spec:
+      containers:
+        - env:
+            - name: FACILITY
+              value: onprem
+            - name: ONLY_MIGRATION
+              value: "true"
+            - name: PGDATABASE
+              value: tinkerbell
+            - name: PGHOST
+              value: db
+            - name: PGPASSWORD
+              value: tinkerbell
+            - name: PGPORT
+              value: "5432"
+            - name: PGSSLMODE
+              value: disable
+            - name: PGUSER
+              value: tinkerbell
+            - name: TINKERBELL_TLS
+              value: ' false'
+          image: quay.io/tinkerbell/tink:${vTINK}
+          name: db-migrations
+          resources: {}
+          volumeMounts:
+            - mountPath: /certs/onprem
+              name: certs
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: certs
+          persistentVolumeClaim:
+            claimName: certs
+            readOnly: true
+status: {}

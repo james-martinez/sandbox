@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ../../kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: hegel
+  name: hegel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: hegel
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ../../kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: hegel
+    spec:
+      containers:
+        - env:
+            - name: CUSTOM_ENDPOINTS
+              value: '{"/metadata":""}'
+            - name: DATA_MODEL_VERSION
+              value: "1"
+            - name: GRPC_PORT
+              value: "42115"
+            - name: HEGEL_FACILITY
+              value: onprem
+            - name: HEGEL_USE_TLS
+              value: "0"
+            - name: TINKERBELL_GRPC_AUTHORITY
+              value: tink-server:42113
+            - name: TINKERBELL_TLS
+              value: ' false'
+          image: quay.io/tinkerbell/hegel:sha-592588cf
+          name: hegel
+          ports:
+            - containerPort: 50060
+            - containerPort: 50061
+          resources: {}
+      restartPolicy: Always
+status: {}

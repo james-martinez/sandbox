@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ../../kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: generate-tls-certs
+  name: generate-tls-certs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: generate-tls-certs
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ../../kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: generate-tls-certs
+    spec:
+      containers:
+        - args:
+            - 192.168.56.4
+          command:
+            - /app/generate.sh
+          env:
+            - name: FACILITY
+              value: onprem
+            - name: TINKERBELL_HOST_IP
+              value: 192.168.56.4
+          image: cfssl/cfssl
+          name: generate-tls-certs
+          resources: {}
+          volumeMounts:
+            - mountPath: /certs/onprem
+              name: certs
+            - mountPath: /app
+              name: generate-tls-certs-claim1
+              readOnly: true
+            - mountPath: /workflow/
+              name: generate-tls-certs-claim2
+      restartPolicy: Always
+      volumes:
+        - name: certs
+          persistentVolumeClaim:
+            claimName: certs
+        - name: generate-tls-certs-claim1
+          persistentVolumeClaim:
+            claimName: generate-tls-certs-claim1
+            readOnly: true
+        - name: generate-tls-certs-claim2
+          persistentVolumeClaim:
+            claimName: generate-tls-certs-claim2
+status: {}

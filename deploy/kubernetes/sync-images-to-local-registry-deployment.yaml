@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ../../kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sync-images-to-local-registry
+  name: sync-images-to-local-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: sync-images-to-local-registry
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ../../kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: sync-images-to-local-registry
+    spec:
+      containers:
+        - args:
+            - /app/upload.sh
+            - admin
+            - Admin1234
+            - 192.168.56.4
+            - quay.io/tinkerbell/tink-worker:${vTINK}
+            - /app/registry_images.txt
+          command:
+            - /bin/bash
+          image: quay.io/containers/skopeo:v1.4.1
+          name: sync-images-to-local-registry
+          resources: {}
+          volumeMounts:
+            - mountPath: /app
+              name: sync-images-to-local-registry-claim0
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: sync-images-to-local-registry-claim0
+          persistentVolumeClaim:
+            claimName: sync-images-to-local-registry-claim0
+            readOnly: true
+status: {}

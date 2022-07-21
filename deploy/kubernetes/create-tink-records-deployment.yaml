@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ../../kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: create-tink-records
+  name: create-tink-records
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: create-tink-records
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ../../kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: create-tink-records
+    spec:
+      containers:
+        - args:
+            - /app/create.sh
+            - /manifests/hardware/hardware.json
+            - /manifests/template/ubuntu.yaml
+            - 192.168.56.4
+            - 192.168.56.43
+            - 08:00:27:9e:f5:3a
+          env:
+            - name: TINKERBELL_GRPC_AUTHORITY
+              value: tink-server:42113
+            - name: TINKERBELL_TLS
+              value: ' false'
+          image: quay.io/tinkerbell/tink-cli:${vTINK}
+          name: create-tink-records
+          resources: {}
+          volumeMounts:
+            - mountPath: /app/create.sh
+              name: create-tink-records-claim0
+              readOnly: true
+            - mountPath: /manifests
+              name: create-tink-records-claim1
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: create-tink-records-claim0
+          persistentVolumeClaim:
+            claimName: create-tink-records-claim0
+            readOnly: true
+        - name: create-tink-records-claim1
+          persistentVolumeClaim:
+            claimName: create-tink-records-claim1
+            readOnly: true
+status: {}

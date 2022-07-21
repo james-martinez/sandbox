@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ../../kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: tink-cli
+  name: tink-cli
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: tink-cli
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ../../kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: tink-cli
+    spec:
+      containers:
+        - env:
+            - name: TINKERBELL_GRPC_AUTHORITY
+              value: tink-server:42113
+            - name: TINKERBELL_TLS
+              value: ' false'
+          image: quay.io/tinkerbell/tink-cli:${vTINK}
+          name: tink-cli
+          resources: {}
+      restartPolicy: Always
+status: {}

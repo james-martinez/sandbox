@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ../../kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: fetch-and-convert-ubuntu-img
+  name: fetch-and-convert-ubuntu-img
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: fetch-and-convert-ubuntu-img
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ../../kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: fetch-and-convert-ubuntu-img
+    spec:
+      containers:
+        - args:
+            - https://cloud-images.ubuntu.com/daily/server/focal/current/focal-server-cloudimg-amd64.img
+            - /destination
+          command:
+            - /app/fetch.sh
+          image: bash:4.4
+          name: fetch-and-convert-ubuntu-img
+          resources: {}
+          volumeMounts:
+            - mountPath: /app/fetch.sh
+              name: fetch-and-convert-ubuntu-img-claim0
+              readOnly: true
+            - mountPath: /destination
+              name: fetch-and-convert-ubuntu-img-claim1
+      restartPolicy: Always
+      volumes:
+        - name: fetch-and-convert-ubuntu-img-claim0
+          persistentVolumeClaim:
+            claimName: fetch-and-convert-ubuntu-img-claim0
+            readOnly: true
+        - name: fetch-and-convert-ubuntu-img-claim1
+          persistentVolumeClaim:
+            claimName: fetch-and-convert-ubuntu-img-claim1
+status: {}
