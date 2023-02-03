@@ -42,11 +42,17 @@ install_k3d() {
 	wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.4.6 bash
 }
 
+install_k9s() {
+	k9s_version="v0.27.2"
+	curl -sLO https://github.com/derailed/k9s/releases/download/$k9s_version/k9s_Linux_amd64.tar.gz && tar xzf k9s_Linux_amd64.tar.gz k9s && sudo mv ./k9s /usr/local/bin/k9s && rm -f k9s_Linux_amd64.tar.gz
+}
+
 start_k3d() {
 	k3d cluster create --network host --no-lb --k3s-arg "--disable=traefik,servicelb" --k3s-arg "--kube-apiserver-arg=feature-gates=MixedProtocolLBService=true" --host-pid-mode
 	mkdir -p ~/.kube/
 	k3d kubeconfig get -a >~/.kube/config
 	until kubectl wait --for=condition=Ready nodes --all --timeout=600s; do sleep 1; done
+	sleep 3
 }
 
 kubectl_for_vagrant_user() {
@@ -109,6 +115,7 @@ run_helm() {
 
 	install_k3d
 	start_k3d
+	install_k9s
 	install_helm
 	helm_customize_values "$loadbalancer_ip" "$helm_chart_version"
 	helm_install_tink_stack "$namespace" "$helm_chart_version" "$loadbalancer_interface"
