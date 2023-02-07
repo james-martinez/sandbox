@@ -52,8 +52,7 @@ start_k3d() {
 	mkdir -p ~/.kube/
 	k3d kubeconfig get -a >~/.kube/config
 	until kubectl wait --for=condition=Ready nodes --all --timeout=600s; do sleep 1; done
-	sleep 3
-	until kubectl wait --for=condition=Available deploy --all -n kube-system; do sleep 1; done
+	until kubectl wait --for=condition=Available deploy --all -n kube-system --timeout=600s; do sleep 1; done
 }
 
 kubectl_for_vagrant_user() {
